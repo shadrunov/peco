@@ -28,7 +28,6 @@ class Layout:
         root.configure(background="#ffffff")
 
         # two frames
-        #
         self.ButtonFrame = tk.Frame(root)
         self.ButtonFrame.grid(column=0, row=0, sticky="N" + "S" + "W")
         self.ButtonFrame.configure(background="#388E3C")
@@ -39,6 +38,7 @@ class Layout:
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
         root.rowconfigure(0, weight=1)
+        root.rowconfigure(1, weight=1)
 
         # buttons at 1 frame
         self.BackBtn = tk.Button(self.ButtonFrame)
@@ -96,6 +96,24 @@ class CurSearchButton(tk.Button):
                            relief="flat",
                            background="grey60",
                            activebackground="grey60",
-                           borderwidth=0)
-        self.grid(column=col_num, row=row_num)
+                           borderwidth=0,
+                           )
+        self.grid(column=col_num, row=row_num,
+                  pady=10, padx=10)
 
+    waste_id = 0
+
+
+
+class WasteFrame(tk.Frame):
+    """
+    This class will create a frame with information
+    """
+    def __init__(self, root):
+        tk.Frame.__init__(self, root)
+
+
+# def change_frame(frame_to_hide, frame_to_show):
+#
+#     frame_to_hide.grid_remove()
+#     frame_to_show.grid()
