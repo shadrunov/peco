@@ -9,22 +9,27 @@ images_dict = {"backButton_image": ["./images/back.png", None],
               "pet_ico": ["images/waste/pet_ico.png", None]}
 
 def get_image(name):
-    if str(name).isdigit():
-        print("isdigit")
+    """
+    this function returns tk.PhotoImage object that was requested with id number or name (as in csv)
+    :param name: equals to name or id in csv
+    :return: tk.PhotoImage object
+    """
+    if str(name).isdigit():  # here we check if we got a number
+        # print("isdigit")
         with open("test.csv", encoding="utf-8") as f:
             first_search_dict = list(csv.DictReader(f))
             for i in first_search_dict:
-                print(i["id"], name)
+                # print(i["id"], name)
                 if i["id"] == name:
                     name = i["path"]
-                    print(name)
-    if name in images_dict:
-        print("yes name is in image_dict")
+                    # print(name)
+    if name in images_dict:  # now name is actually the name string and we can see it in csv name field
+        # print("yes name is in image_dict")
         if images_dict[name][1] is None:
-            print(("yes images_dict is none"))
+            # print(("yes images_dict is none"))
             images_dict[name][1] = tk.PhotoImage(file=images_dict[name][0])
-        return images_dict[name][1]
-    print("return none")
+        return images_dict[name][1]  # return a tk.PhotoImage object
+    # print("return none")
     return None
 ###########################################################
 
@@ -102,8 +107,16 @@ class CurSearchButton(tk.Button):
     """
     this class helps to add buttons with waste instances, which you can click and go to
     the new right frame
+
+    :parameter waste_id: an id number set to the button in change_search_results function
     """
     def __init__(self, frame, col_num=0, row_num=0):
+        """
+        initialisation occurs in SuggestButtons generation
+        :param frame: parental widget
+        :param col_num: column number
+        :param row_num: row number
+        """
         tk.Button.__init__(self, frame,
                            relief="flat",
                            background="grey60",
@@ -111,9 +124,8 @@ class CurSearchButton(tk.Button):
                            borderwidth=0)
         self.grid(column=col_num, row=row_num,
                   pady=10, padx=10)
-
+    # this number changes as user types
     waste_id = 0
-
 
 
 class WasteFrame(tk.Frame):
@@ -121,13 +133,28 @@ class WasteFrame(tk.Frame):
     This class will create a frame with information
     """
     def __init__(self, root):
+        """
+        initialisation
+        we create a frame, a label with text, an image
+        :param root: parental widget is top
+        """
         tk.Frame.__init__(self, root)
         self.label = tk.Label(self)
         self.label.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
         self.image_canvas = tk.Canvas(self, bg="grey", width=160, height=160)
         self.image_canvas.grid(column=0, row=0, padx=10, pady=10)
     def show(self, id):
+        """
+
+        :param id: this comes from go_waste_function and there it had come from change_search_results function
+        :return: no
+        """
+        # we show the frame (self)
         self.grid(column=1, row=0, sticky="N" + "S" + "E")
+        # this stores a tk.PhotoImage object with current image
         self.img = get_image(id)
+        # we show image
         self.image_canvas.create_image(0, 0, anchor="nw", image=self.img)
+        # we show text
         self.label.configure(text=str(id)+"sssssssssssssssssss /n ssssssssssssssss")
+        # we change the button back to button close HOW THE FUCK WE ARE GONNA DO THIS???
