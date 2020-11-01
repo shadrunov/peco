@@ -1,23 +1,6 @@
-import tkinter as tk
-
-class AdvBtn(tk.Button):
-    def __init__(self):
-        tk.Button.__init__(self)
-        self.grid()
-        print(self.atr)
-    atr = 0
-
-
-
-
-
-
-
-
-top = tk.Tk()
-
-b = AdvBtn()
-
-print(b.atr)
-
-top.mainloop()
+import csv
+with open("test.csv", encoding="utf-8") as f:
+    first_search_dict = list(csv.DictReader(f))
+    for i in first_search_dict:
+        if i["id"] == name:
+            name = i["name"]

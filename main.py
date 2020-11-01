@@ -16,7 +16,6 @@ amount_of_buttons = 3
 SuggestButtons = []
 for i in range(amount_of_buttons):
     SuggestButtons.append(CurSearchButton(app.CurSearchFrame, col_num=i))
-    SuggestButtons[i].configure(command=lambda: go_waste(SuggestButtons[i].waste_id))
 
 
 
@@ -35,6 +34,8 @@ def change_search_results(*args):
                                                                       width=160, height=160)
                 # this line changes the "waste_id number" attribute according to the waste
                 SuggestButtons[counter % amount_of_buttons].waste_id = row["id"]
+                print("button id is ", SuggestButtons[counter % amount_of_buttons].waste_id)
+                SuggestButtons[counter % amount_of_buttons].configure(command=lambda q=row["id"]: go_waste(q))
                 # SuggestButtons[counter % amount_of_buttons].configure(text=(row["path"]))
                 SuggestButtons[counter % amount_of_buttons].grid()
                 #print(row, SuggestButtons[counter % amount_of_buttons])
@@ -50,7 +51,7 @@ def change_search_results(*args):
 # link StringVar cur_search modification and func change_search_results
 app.cur_search.trace_add('write', change_search_results)
 
-
+waste_frame = WasteFrame(top)
 
 def go_waste(waste_id_local):
     """
@@ -58,8 +59,10 @@ def go_waste(waste_id_local):
     :param waste_id_local: this number goes from csv file with waste
     :return: nothing actually
     """
-    print(waste_id_local)
+    print("waste_id_local", waste_id_local)
     app.MainFrame.grid_remove()
+
+    waste_frame.show(waste_id_local)
 
 
 

@@ -9,10 +9,22 @@ images_dict = {"backButton_image": ["./images/back.png", None],
               "pet_ico": ["images/waste/pet_ico.png", None]}
 
 def get_image(name):
+    if str(name).isdigit():
+        print("isdigit")
+        with open("test.csv", encoding="utf-8") as f:
+            first_search_dict = list(csv.DictReader(f))
+            for i in first_search_dict:
+                print(i["id"], name)
+                if i["id"] == name:
+                    name = i["path"]
+                    print(name)
     if name in images_dict:
+        print("yes name is in image_dict")
         if images_dict[name][1] is None:
+            print(("yes images_dict is none"))
             images_dict[name][1] = tk.PhotoImage(file=images_dict[name][0])
         return images_dict[name][1]
+    print("return none")
     return None
 ###########################################################
 
@@ -96,8 +108,7 @@ class CurSearchButton(tk.Button):
                            relief="flat",
                            background="grey60",
                            activebackground="grey60",
-                           borderwidth=0,
-                           )
+                           borderwidth=0)
         self.grid(column=col_num, row=row_num,
                   pady=10, padx=10)
 
@@ -111,9 +122,12 @@ class WasteFrame(tk.Frame):
     """
     def __init__(self, root):
         tk.Frame.__init__(self, root)
-
-
-# def change_frame(frame_to_hide, frame_to_show):
-#
-#     frame_to_hide.grid_remove()
-#     frame_to_show.grid()
+        self.label = tk.Label(self)
+        self.label.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
+        self.image_canvas = tk.Canvas(self, bg="grey", width=160, height=160)
+        self.image_canvas.grid(column=0, row=0, padx=10, pady=10)
+    def show(self, id):
+        self.grid(column=1, row=0, sticky="N" + "S" + "E")
+        self.img = get_image(id)
+        self.image_canvas.create_image(0, 0, anchor="nw", image=self.img)
+        self.label.configure(text=str(id)+"sssssssssssssssssss /n ssssssssssssssss")
