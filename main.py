@@ -62,10 +62,12 @@ def go_waste(waste_id_local):
     :return: nothing actually
     """
     # print("waste_id_local", waste_id_local)
-    # we hide MainFrame
-    app.MainFrame.grid_remove()
+
     # and show waste frame which has been adjusted according to the waste id number
-    waste_frame.show(waste_id_local)
+    # we send id number and the button to close
+    waste_frame.show(waste_id_local, app)
+
+
 
 # just loop
 top.mainloop()

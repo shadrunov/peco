@@ -6,7 +6,8 @@ images_dict = {"backButton_image": ["./images/back.png", None],
               "searchButton_image": ["./images/search.png", None],
               "paper_ico": ["./images/waste/paper_ico.png", None],
               "iron_ico": ["images/waste/iron_ico.png", None],
-              "pet_ico": ["images/waste/pet_ico.png", None]}
+              "pet_ico": ["images/waste/pet_ico.png", None],
+              "closeButton_image": ["images/close.png", None]}
 
 def get_image(name):
     """
@@ -32,6 +33,16 @@ def get_image(name):
     # print("return none")
     return None
 ###########################################################
+
+
+def get_text(id):
+    with open("test_text.csv", encoding="utf-8") as f_text:
+        text_dict = csv.reader(f_text)
+        for line in text_dict:
+            if line[0] == id:
+                return line[1]
+        return "Not found"
+
 
 
 class Layout:
@@ -139,11 +150,14 @@ class WasteFrame(tk.Frame):
         :param root: parental widget is top
         """
         tk.Frame.__init__(self, root)
-        self.label = tk.Label(self)
-        self.label.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
+        self.text = tk.Text(self, wrap="word", height=8, width=40, font=("Segoe UI", 14))
+        self.text.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
         self.image_canvas = tk.Canvas(self, bg="grey", width=160, height=160)
-        self.image_canvas.grid(column=0, row=0, padx=10, pady=10)
-    def show(self, id):
+        self.image_canvas.grid(column=0, row=0, padx=20, pady=20, sticky="nw")
+        self.label = tk.Label(self, text="labellllllllll")
+        self.label.grid(column=1, row=0, padx=10, pady=10)
+        self.rowconfigure(0, minsize=100)
+    def show(self, id, app):
         """
 
         :param id: this comes from go_waste_function and there it had come from change_search_results function
@@ -156,5 +170,25 @@ class WasteFrame(tk.Frame):
         # we show image
         self.image_canvas.create_image(0, 0, anchor="nw", image=self.img)
         # we show text
-        self.label.configure(text=str(id)+"sssssssssssssssssss /n ssssssssssssssss")
-        # we change the button back to button close HOW THE FUCK WE ARE GONNA DO THIS???
+        self.text.insert(1.0, "get_text(id)")
+        self.text.configure(state = "disabled")
+        # we hide MainFrame
+        app.MainFrame.grid_remove()
+        # we change the button back to button close
+        app.BackBtn.grid_remove()
+        # button Close
+        self.CloseBtn = tk.Button(app.ButtonFrame)
+        self.CloseBtn.grid(column=0, row=0, padx=20, pady=15, sticky="N")
+        self.CloseBtn.configure(background="#388E3C",
+                               borderwidth="0",
+                               activebackground="#388E3C",
+                               relief="flat",
+                               image=get_image("closeButton_image"),
+                               width=72, height=72,
+                               command=lambda: self.close(app))
+
+    def close(self, app):
+        self.grid_remove()
+        app.MainFrame.grid()
+        self.CloseBtn.grid_remove()
+        app.BackBtn.grid()
