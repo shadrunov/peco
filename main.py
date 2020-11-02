@@ -7,7 +7,7 @@ app = Layout(top)  # app is our app - class Layout instance
 
 # переписали всё из файла в список словарей first_search_dict
 # we use first_search_dict in change_search_results func to get waste item from its name
-with open("test.csv", encoding="utf-8") as f:
+with open(FILE, encoding="utf-8") as f:
     first_search_dict = list(csv.DictReader(f))
     print(first_search_dict)
 

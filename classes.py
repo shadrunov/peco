@@ -1,7 +1,15 @@
 import tkinter as tk
 import csv
+
+FILE = "test.csv"
+FILE_TEXT = "test_text.csv"
+# FILE = "first_search.csv"
+# FILE_TEXT = "test_text.csv"
+
 ###########################################################
 """ image processing """
+with open(FILE, encoding="utf-8") as f:
+    first_search_dict = list(csv.DictReader(f))
 images_dict = {"backButton_image": ["./images/back.png", None],
               "searchButton_image": ["./images/search.png", None],
               "paper_ico": ["./images/waste/paper_ico.png", None],
@@ -17,7 +25,7 @@ def get_image(name):
     """
     if str(name).isdigit():  # here we check if we got a number
         # print("isdigit")
-        with open("test.csv", encoding="utf-8") as f:
+        with open(FILE, encoding="utf-8") as f:
             first_search_dict = list(csv.DictReader(f))
             for i in first_search_dict:
                 # print(i["id"], name)
@@ -36,14 +44,28 @@ def get_image(name):
 
 
 def get_text(id):
-    with open("test_text.csv", encoding="utf-8") as f_text:
+    print("get text", id)
+    with open(FILE_TEXT, encoding="utf-8") as f_text:
+        print("opened file", id)
         text_dict = csv.reader(f_text)
         for line in text_dict:
+            print(line[0], id)
             if line[0] == id:
+                print("return result", line[1], id)
                 return line[1]
         return "Not found"
 
-
+def get_label(id):
+    print("get label", id)
+    with open(FILE_TEXT, encoding="utf-8") as f_text:
+        print("opened file", id)
+        text_dict = csv.reader(f_text)
+        for line in text_dict:
+            print(line[0], id)
+            if line[0] == id:
+                print("return result", line[2], id)
+                return line[2]
+        return "Not found"
 
 class Layout:
     """
@@ -150,13 +172,27 @@ class WasteFrame(tk.Frame):
         :param root: parental widget is top
         """
         tk.Frame.__init__(self, root)
-        self.text = tk.Text(self, wrap="word", height=8, width=40, font=("Segoe UI", 14))
-        self.text.grid(column=0, row=1, columnspan=2, padx=10, pady=10)
-        self.image_canvas = tk.Canvas(self, bg="grey", width=160, height=160)
-        self.image_canvas.grid(column=0, row=0, padx=20, pady=20, sticky="nw")
-        self.label = tk.Label(self, text="labellllllllll")
-        self.label.grid(column=1, row=0, padx=10, pady=10)
-        self.rowconfigure(0, minsize=100)
+        self.text = tk.Text(self, wrap="word",
+                            height=8, width=60,
+                            font=("Segoe UI", 14),
+                            bd=0, relief="flat")
+        self.text.grid(column=0, row=1,
+                       columnspan=2,
+                       padx=20, pady=10, sticky="NW")
+
+        self.image_label = tk.Label(self, bg="grey")
+        self.image_label.grid(column=0, row=0,
+                              padx=20, pady=20,
+                              sticky="W")
+
+        self.label = tk.Label(self,
+                              font=("Segoe UI", 24, "bold"),
+                              anchor="w", bg="grey", bd=0)
+        self.label.grid(column=1, row=0,
+                        padx=20, pady=20,
+                        sticky="W")
+        self.rowconfigure(0, minsize=200)
+        self.rowconfigure(1, minsize=250)
     def show(self, id, app):
         """
 
@@ -168,10 +204,12 @@ class WasteFrame(tk.Frame):
         # this stores a tk.PhotoImage object with current image
         self.img = get_image(id)
         # we show image
-        self.image_canvas.create_image(0, 0, anchor="nw", image=self.img)
+        self.image_label.configure(image=self.img, width=160, height=160)
         # we show text
-        self.text.insert(1.0, "get_text(id)")
+        self.text.insert(1.0, get_text(id))
         self.text.configure(state = "disabled")
+
+        self.label.configure(text=get_label(id))
         # we hide MainFrame
         app.MainFrame.grid_remove()
         # we change the button back to button close
@@ -192,3 +230,5 @@ class WasteFrame(tk.Frame):
         app.MainFrame.grid()
         self.CloseBtn.grid_remove()
         app.BackBtn.grid()
+        self.text.configure(state="normal")
+        self.text.delete('1.0', tk.END)

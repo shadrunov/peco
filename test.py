@@ -107,7 +107,7 @@ class CurSearchButton(tk.Button):
 top = tk.Tk()
 
 # переписали всё из файла в список словарей first_search_dict
-with open("test.csv", encoding="utf-8") as f:
+with open(FILE, encoding="utf-8") as f:
     first_search_dict = list(csv.DictReader(f))
 
 

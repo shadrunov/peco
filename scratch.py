@@ -1,6 +1,6 @@
 import csv
-with open("test_text.csv", encoding="utf-8") as f_text:
-    read = csv.reader(f_text)
-    for i in read:
+
+with open("test.csv", encoding="utf-8") as f:
+    first_search_dict = list(csv.DictReader(f))
+    for i in first_search_dict:
         print(i)
-        if i[0] ==
