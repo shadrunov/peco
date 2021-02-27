@@ -1,73 +1,83 @@
-import tkinter as tk
-import csv
 from classes import *
 
-top = tk.Tk()  # top is root element to create an app
-app = Layout(top)  # app is our app - class Layout instance
 
-# переписали всё из файла в список словарей first_search_dict
-# we use first_search_dict in change_search_results func to get waste item from its name
-with open(FILE, encoding="utf-8") as f:
-    first_search_dict = list(csv.DictReader(f))
-    print(first_search_dict)
-
-# we create a list of suggested buttons - they lead us to the information about specific waste item
-amount_of_buttons = 3  # how many buttons do we have maximum
-SuggestButtons = []
-for i in range(amount_of_buttons):
-    SuggestButtons.append(CurSearchButton(app.CurSearchFrame, col_num=i))
-
-
-# определим функцию, которая будет менять список результатов
 def change_search_results(*args):
+    """
+    This function changes search results
+    It adds up to 3 big buttons and up to 6 small buttons with right images 
+    If you click them, frame with actual search information will appear
+    :param args: Вообще-то мы не используем никакие из переданных аргументов, но обработчик изменения строки поиска 
+    что-то передаёт при вызове этой функции, и мы должны это поддерживать
+    :return: None
+    """
     counter = 0  # how many buttons are already on the screen
-    request = app.cur_search.get().strip()  # we read user's request from search line and strip it
+    counter_small = [0, 0, 0]  # very complex counter for small buttons
+    request = main_frame.cur_search.get().strip().casefold()  # we read string from search line
+    buf = []  # what items have already been used
 
-    if request == "":
-        app.CurSearchFrame.grid_remove()  # we hide frame with results
+    if len(request) < 2:  # show nothing if request is too short
+        main_frame.CurSearchFrame.grid_remove()  # so we hide frames with button
+        main_frame.SmallSearchFrame.grid_remove()
     else:
-        app.CurSearchFrame.grid()  # we show frame with results
-        for row in first_search_dict:  # go through the whole dictionary
-            if request in row["name"]:
-                # set right image into the button
-                SuggestButtons[counter % amount_of_buttons].configure(image=get_image(row["path"]),
-                                                                      width=160, height=160)
-                # set waste_id attribute of button equal to id from dictionary
-                SuggestButtons[counter % amount_of_buttons].waste_id = row["id"]
-                # print("button id is ", SuggestButtons[counter % amount_of_buttons].waste_id)
-                # bind func with right parameters and the button
-                SuggestButtons[counter % amount_of_buttons].configure(command=lambda q=row["id"]: go_waste(q))
-                # show button
-                SuggestButtons[counter % amount_of_buttons].grid()
-                # print(row, SuggestButtons[counter % amount_of_buttons])
-                #print(SuggestButtons[counter % amount_of_buttons].waste_id)
-                counter += 1
-    # print(counter)
-    # if counter < amount_of_buttons: delete unused buttons
-    for i in range(counter, amount_of_buttons):
-        SuggestButtons[i].grid_remove()
-
-
-# bind StringVar cur_search modification and func change_search_results
-app.cur_search.trace_add('write', change_search_results)
-
-# we create a WasteFrame instance - to show info and images
-waste_frame = WasteFrame(top)
+        for row in search_dict:  # go through the dictionary
+            if request in row["name"] and row["id"] not in buf:  # this row matches with search request and hasn't been used yet
+                buf.append(row["id"])
+                if row["small"] != "small":  # show big button
+                    main_frame.CurSearchFrame.grid()  # show frame with big buttons
+                    # set right image into the button
+                    SuggestButtons[counter % 3].configure(image=icons_dict.get(row["id"]),
+                                                                          width=160, height=160)
+                    # set waste_id attribute of button equal to id from dictionary
+                    SuggestButtons[counter % 3].waste_id = row["id"]
+                    # bind func with button
+                    SuggestButtons[counter % 3].configure(command=lambda q=row["id"]: go_waste(q))
+                    SuggestButtons[counter % 3].grid()  # show button
+                    counter += 1
+                else:
+                    main_frame.SmallSearchFrame.grid()  # show frame with small buttons
+                    # set image
+                    SmallButtons[counter_small[0]][counter_small[1]].configure(image=icons_dict.get(row["id"]),
+                                                                               width=160, height=60)
+                    SmallButtons[counter_small[0]][counter_small[1]].waste_id = row["id"]  # set id number and bind with function
+                    SmallButtons[counter_small[0]][counter_small[1]].configure(command=lambda q=row["id"]: go_waste(q))
+                    SmallButtons[counter_small[0]][counter_small[1]].grid()  # show on the screen
+                    counter_small[1] += 1  # counter! as we show small buttons in two rows and three columns,
+                    counter_small[2] += 1  # counter_small[0] is the number of column, and counter_small[1] is the number of row
+                    if counter_small[1] == 3:
+                        counter_small[1] = 0
+                        counter_small[0] += 1
+                    if counter_small[0] == 2:
+                        counter_small[0] = 0
+        if counter == 0:  # no big buttons so we hide frame with them
+            main_frame.CurSearchFrame.grid_remove()
+        for p in range(counter, 3):  # if less then 3 big buttons remove unused buttons
+            SuggestButtons[p].grid_remove()
+        if counter_small[2] < 6:  # if less then 6 small buttons remove unused ones as well
+            for i in range(counter_small[1], 3):  # in the current row
+                SmallButtons[counter_small[0]][i].grid_remove()
+            for i in range(counter_small[0]+1, 2):  # and in all rows below
+                for j in range(3):
+                    SmallButtons[i][j].grid_remove()
 
 
 def go_waste(waste_id_local):
     """
-    this function raises up the frame with useful information
-    :param waste_id_local: this number comes from button waste id
-    :return: nothing actually
+    This function raises up the frame with search response
+    :param waste_id_local: id of waste, comes from the pressed button
+    :return:
     """
-    # print("waste_id_local", waste_id_local)
+    waste_frame.show(waste_id_local, main_frame)
 
-    # and show waste frame which has been adjusted according to the waste id number
-    # we send id number and the button to close
-    waste_frame.show(waste_id_local, app)
+# top is root element in the main_frame
+top = tk.Tk()
+waste_frame = WasteFrame(top)
+main_frame = MainFrame(top)  # main_frame is our main_frame - class MainFrame instance
+search_dict = create_search_dict()  # creates dict with all supported search requests
 
+SuggestButtons, SmallButtons = create_buttons(main_frame)  # two lists with buttons
+if __name__ == '__main__':
+    
 
-
-# just loop
-top.mainloop()
+    # cur_search это StringVar
+    main_frame.cur_search.trace_add('write', change_search_results)  # обработчик на изменение строки
+    top.mainloop()
